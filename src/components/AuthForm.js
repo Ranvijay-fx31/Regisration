@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import "./styles.css";
 
+/**
+ * Authentication form component that handles both login and registration
+ */
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -10,27 +13,50 @@ const AuthForm = () => {
     password: "",
   });
 
+  // Form field validation check
+  const isFormValid = () => {
+    const { email, password, name } = formData;
+    return email && password && (isLogin || name);
+  };
+
+  // Toggle between login and registration modes
   const toggleMode = () => {
     setIsLogin(!isLogin);
+    // Reset form data when switching modes
     setFormData({ name: "", email: "", password: "" });
   };
 
+  // Handle input field changes
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.email || !formData.password || (!isLogin && !formData.name)) {
+    
+    if (!isFormValid()) {
       alert("All fields are required");
       return;
     }
-    alert(`${isLogin ? "Logged in" : "Registered"} successfully!`);
+    
+    const actionType = isLogin ? "Logged in" : "Registered";
+    alert(`${actionType} successfully!`);
   };
+
+  // Determine the button and heading text based on current mode
+  const actionText = isLogin ? "Login" : "Register";
+  const toggleText = isLogin 
+    ? "Don't have an account? Register" 
+    : "Already have an account? Login";
 
   return (
     <div className="auth-container">
-      <h2>{isLogin ? "Login" : "Register"}</h2>
+      <h2>{actionText}</h2>
       <form onSubmit={handleSubmit}>
         {!isLogin && (
           <input
@@ -55,10 +81,10 @@ const AuthForm = () => {
           value={formData.password}
           onChange={handleChange}
         />
-        <button type="submit">{isLogin ? "Login" : "Register"}</button>
+        <button type="submit">{actionText}</button>
       </form>
       <p onClick={toggleMode} className="toggle-text">
-        {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
+        {toggleText}
       </p>
     </div>
   );
